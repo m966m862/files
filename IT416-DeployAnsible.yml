@@ -1,0 +1,82 @@
+---
+
+# Connect to Ansible on the localhost
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  user: remote
+
+  # Dynamic variables. Prompt the user to fill in. Use default if nothing provided by user
+  vars_prompt:
+
+    # What vCenter should the VM be deployed to.
+    - name: "vcenter_host"
+      prompt: "Please enter the vCenter host"
+      private: no
+      default: vcenter.kuisc.com
+
+    # Username to log in to vCenter with.
+    - name: "vcenter_username"
+      private: no
+      default: 'it416test'
+      prompt: "Please enter your username"
+
+    # Password to log in to vCenter with.
+    - name: "vcenter_password"
+      default: 'IT416Test!'
+      prompt: "Please enter your password"
+
+      # Resource pool to create the VM in.
+    - name: "resource_pool"
+      prompt: "What resource pool would you like to create the VM in?"
+      private: no
+      default: "IT 416 - System Integration and Architecture"
+
+    # Any notes you would like put in the VM information.
+    - name: "notes"
+      prompt: "Please enter any notes"
+      private: no
+      default: "Deployed with Ansible"
+
+  # Grab the current date and time.
+  tasks:
+  - set_fact: creationdate="{{lookup('pipe','date "+%m/%d/%Y %H:%M %p"')}}"
+
+  - name: Create VM from Template
+    vmware_guest:
+
+      # Log in to the vCenter host.
+      hostname: '{{ vcenter_host }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'
+
+      # Create the VM in the cluster located in the BEST building.
+      cluster: BEST
+      resource_pool: '{{ resource_pool }}'
+
+      # Create the VM in the Edwards Datacenter.
+      datacenter: Edwards
+      
+      # Folder to place the new VM in. 
+      # The {{ item }} is used for the loop. {{ item }} will be replaced by each value in the
+      # loop section listed below.
+      folder: '/Classes/IT 416 - System Integration and Architecture/{{ item }}'
+
+      # Use the IT416-CentOS7 template and give it a name.
+      # Again, {{ item }} is replaced by each item in the loop section below.
+      template: IT416-CentOS7
+      name: '{{ item }} - Ansible'
+
+      # Add notes to the Notes section of the VM
+      annotation: '{{ notes }}'
+
+    # IT 416 students
+    loop:
+      - Boles
+      - Dietz
+      - Dimmick
+      - George
+      - Ladage
+      - McCurry
+      - Njie
+      - Vinson
