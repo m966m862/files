@@ -1,0 +1,28 @@
+---
+- hosts: 127.0.0.1
+  connection:local
+
+  tasks:
+  - vmware_guest:
+      hostname: IT416-Kali-McCurry 
+      username: m966m862
+      password: Teksab10#
+      validate_certs: no
+      datacenter: Edwards
+      folder: /Classes/IT 416 - System Integration and Architecture
+      name: IT416-Kali-McCurry
+      state: poweredon
+      template: Kali-Template
+
+      hardware:
+        num_cpus: 4
+
+      networks:
+      - name: VM Network
+        ip: 192.168.5.245
+        netmask: 255.255.255.0
+        gateway: 192.168.5.254
+        domain: internal.it416.com
+        dns_servers:
+        - 8.8.8.8
+      wait_for_ip_address: yes
